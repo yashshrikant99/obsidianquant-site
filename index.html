@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ObsidianQuant Capital — Research to Live, Live to Fill</title>
+<meta name="description" content="Two systems, one core: a research-to-live pipeline and a live execution engine that share the same code, data and cost model.">
+<style>
+:root{
+  --bg:#0a0c11;--panel:#11151d;--panel2:#151a24;--line:#1f2634;--soft:#181e29;
+  --tx:#e8ebf1;--dim:#98a2b5;--faint:#6d7689;
+  --acc:#5aa9ff;--acc2:#2d5f9e;--grn:#3ddc97;--amb:#e8b84b;--red:#e06c6c;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--sans);line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.wrapx{max-width:1640px;margin:0 auto;padding:0 24px}
+.dfull{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+.dfull a{font-family:var(--mono);font-size:10px;color:var(--acc);letter-spacing:.05em}
+.cred{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #1f3a2c;border-radius:10px;overflow:hidden;margin-top:26px;background:linear-gradient(180deg,#0f1a16,#0c1512)}
+@media(max-width:760px){.cred{grid-template-columns:1fr}}
+.cred div{padding:15px 18px}
+.cred div+div{border-left:1px solid #1f3a2c}
+@media(max-width:760px){.cred div+div{border-left:none;border-top:1px solid #1f3a2c}}
+.cred .ch{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--grn);margin-bottom:6px}
+.cred p{margin:0;font-size:12.5px;color:var(--dim);line-height:1.5}
+.cred b{color:var(--tx);font-weight:550}
+.hire{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel);margin-bottom:16px}
+.hrow{display:grid;grid-template-columns:1.05fr 1fr;border-top:1px solid var(--soft)}
+.hrow:first-child{border-top:none}
+.hp{padding:13px 17px;background:#0f1218;color:var(--dim);font-size:13px;line-height:1.45;font-style:italic;display:flex;gap:9px}
+.hp i{color:var(--faint);font-style:normal;font-size:20px;line-height:1;flex:none}
+.he{padding:13px 17px;display:flex;flex-direction:column;justify-content:center}
+.he b{font-size:13.5px;color:var(--tx);font-weight:620;margin-bottom:3px;letter-spacing:-.01em}
+.he span{font-size:11.5px;color:var(--faint);font-family:var(--mono);line-height:1.5}
+@media(max-width:760px){.hrow{grid-template-columns:1fr}.he{border-top:1px solid var(--soft)}}
+.shapes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:11px;color:var(--faint);border:1px solid var(--line);border-radius:9px;padding:12px 15px;background:var(--panel2)}
+.shapes b{color:var(--acc);font-weight:500}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(10,12,17,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--soft)}
+.nv{display:flex;align-items:center;justify-content:space-between;height:52px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;letter-spacing:-.01em}
+.brand i{color:var(--acc);font-style:normal}
+.nl{display:flex;gap:22px;font-size:12.5px}.nl a{color:var(--dim)}.nl a:hover{color:var(--tx);text-decoration:none}
+@media(max-width:760px){.nl{display:none}}
+
+h1{font-size:clamp(28px,4.6vw,46px);line-height:1.08;margin:0 0 14px;letter-spacing:-.03em;font-weight:660;max-width:20ch}
+h2{font-size:clamp(19px,2.4vw,25px);margin:0 0 18px;letter-spacing:-.022em;font-weight:630}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:10px}
+.tag.g{color:var(--faint)}
+section{padding:54px 0;border-bottom:1px solid var(--soft)}
+header{padding:80px 0 54px;border-bottom:1px solid var(--soft)}
+.hsub{font-size:16px;color:var(--dim);max-width:58ch;margin:0 0 26px}
+.hsub b{color:var(--tx);font-weight:550}
+.btns{display:flex;gap:11px;flex-wrap:wrap}
+.btn{padding:10px 19px;border-radius:7px;font-size:13.5px;font-weight:550;border:1px solid var(--line);transition:.15s}
+.bp{background:var(--acc);color:#05080d;border-color:var(--acc)}.bp:hover{background:#7abaff;text-decoration:none}
+.bs{color:var(--dim)}.bs:hover{color:var(--tx);border-color:#2d3749;text-decoration:none}
+
+.dgm{border:1px solid var(--line);border-radius:11px;background:var(--panel);overflow:hidden}
+.dgm-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.dgm-h b{color:var(--tx);font-weight:600;letter-spacing:.06em}
+.dgm-b{padding:16px}
+.dwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dwrap img{display:block;width:100%;height:auto;min-width:880px}
+.dhint{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px;letter-spacing:.05em}
+@media(min-width:980px){.dhint{display:none}}
+
+.eng{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.eng{grid-template-columns:1fr}}
+.ec{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 17px;display:flex;flex-direction:column}
+.ec .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+.ec h3{margin:0 0 7px;font-size:15px;font-weight:620}
+.ec p{margin:0 0 12px;font-size:12.5px;color:var(--dim);flex:1;line-height:1.45}
+.ec .mt{font-family:var(--mono);font-size:11px;color:var(--faint);border-top:1px solid var(--soft);padding-top:9px}
+
+.omit{display:flex;flex-wrap:wrap;gap:7px;align-items:center;border:1px solid #263041;border-left:3px solid var(--amb);border-radius:9px;padding:14px 16px;background:linear-gradient(180deg,#131821,#10141b);margin-top:14px}
+.omit .ot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--amb);margin-right:4px}
+.ox{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #4a2530;background:#251418;color:var(--red)}
+.oy{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #1f5340;background:#122620;color:var(--grn)}
+
+footer{padding:54px 0 70px}
+.fg{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.fl{max-width:40ch}.fl p{color:var(--dim);font-size:13.5px;margin:0}
+.ct{font-family:var(--mono);font-size:13px;line-height:2}
+.ct .l{color:var(--faint);display:inline-block;width:74px}
+.fine{margin-top:40px;padding-top:17px;border-top:1px solid var(--soft);font-size:11px;color:var(--faint);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap nv">
+  <div class="brand"><i>&#9670;</i> ObsidianQuant Capital</div>
+  <div class="nl">
+    <a href="#data">Data</a><a href="#pipeline">Research</a><a href="#engine">Live engine</a><a href="#workflow">The arc</a>
+    <a href="#engage">Hire us for</a><a href="#contact">Contact</a>
+  </div>
+</div></nav>
+
+<header><div class="wrap">
+  <div class="tag">Quant infrastructure for funds without the engineering bandwidth</div>
+  <h1>Two systems. One core. No translation layer.</h1>
+  <p class="hsub">
+    Most funds run research in one idiom and execution in another, with a rewrite between them.
+    <b>That rewrite is where the months and the bugs live.</b>
+  </p>
+  <div class="btns">
+    <a class="btn bp" href="#engage">Start a conversation</a>
+    <a class="btn bs" href="#data">See the architecture</a>
+  </div>
+
+  <div class="cred">
+    <div>
+      <div class="ch">&#9670; Run on our own capital</div>
+      <p>Not a reference implementation. This stack places <b>real orders</b>, reconciles
+        <b>real fills</b> and carries <b>real risk</b> every session. A bug costs us directly.</p>
+    </div>
+    <div>
+      <div class="ch">&#9670; Proprietary only &mdash; no outside money</div>
+      <p>We manage no client capital. <b>Your strategies never enter our system</b> &mdash; they are
+        plugins you own, and the boundary is enforced in CI, not promised in an NDA.</p>
+    </div>
+  </div>
+</div></header>
+
+<section id="data"><div class="wrapx">
+  <div class="tag g">01</div>
+  <h2>Unified data pipeline</h2>
+  <div class="dgm">
+    <div class="dgm-h"><b>ETL &mdash; live and historical into one snapshot</b><span>fundamental + technical + derivatives, per instrument, per trade date</span></div>
+    <div class="dgm-b">
+      <div class="dwrap">
+        <img src="diagrams/data-pipeline.svg" alt="Unified data pipeline: live streaming ticks and historical EOD packs, instrument master, corporate actions, fundamentals and option chains both pass through one normalize path and quality screens into a single snapshot keyed by instrument and trade date, carrying technical, fundamental, derivatives and provenance columns, read by both live strategies and research or backtest">
+      </div>
+      <div class="dfull">
+        <span class="dhint">&harr; scroll to follow the full path</span>
+        <a href="diagrams/data-pipeline.png" target="_blank" rel="noopener">open full size &#8599;</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="pipeline"><div class="wrapx">
+  <div class="tag g">02</div>
+  <h2>Research method</h2>
+  <div class="dgm">
+    <div class="dgm-h"><b>Is it real &rarr; how do we trade it &rarr; does it survive</b><span>ordered by question, not by technique</span></div>
+    <div class="dgm-b">
+      <div class="dwrap">
+        <img src="diagrams/research-to-live.svg" alt="Research to live: hypothesis and unified panel feed a sweep, then walk-forward, combinatorial cross-validation and tail-risk gates, each able to reject into a kept negative result; survivors promote through backtest, paper, shadow and live on the same core">
+      </div>
+      <div class="dfull">
+        <span class="dhint">&harr; scroll to follow the full path</span>
+        <a href="diagrams/research-to-live.png" target="_blank" rel="noopener">open full size &#8599;</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="engine"><div class="wrapx">
+  <div class="tag g">03</div>
+  <h2>Live execution engine</h2>
+  <div class="dgm">
+    <div class="dgm-h"><b>Market data in &rarr; intents &rarr; orders out</b><span>1 venue &middot; N brokers &middot; N strategies &middot; 1 core</span></div>
+    <div class="dgm-b">
+      <div class="dwrap">
+        <img src="diagrams/live-engine.svg" alt="Live execution engine round trip: venue quotes flow to N brokers, raw ticks normalize into one canonical market state in the shared core, which N strategies read; strategies emit intents back into the core where capital sizes them, RMS authorizes them and EMS routes orders to any broker behind the same port; orders reach the venue, fills return to OMS, position facts feed back to RMS, and every transition is journaled">
+      </div>
+      <div class="dfull">
+        <span class="dhint">&harr; scroll to follow the full path</span>
+        <a href="diagrams/live-engine.png" target="_blank" rel="noopener">open full size &#8599;</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="workflow"><div class="wrapx">
+  <div class="tag g">04</div>
+  <h2>The whole arc</h2>
+  <div class="dgm">
+    <div class="dgm-h"><b>Hypothesis &rarr; full size</b><span>capital rises only as evidence does &middot; every stage has a tested kill switch</span></div>
+    <div class="dgm-b">
+      <div class="dwrap">
+        <img src="diagrams/workflow.svg" alt="End-to-end arc: hypothesis, ablation, expression across equity future or option, point-in-time backtest net of cost, portfolio correlation by marginal contribution, then paper, restricted and full size">
+      </div>
+      <div class="dfull">
+        <span class="dhint">&harr; scroll to follow the full arc</span>
+        <a href="diagrams/workflow.png" target="_blank" rel="noopener">open full size &#8599;</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="engage"><div class="wrap">
+  <div class="tag g">05</div>
+  <h2>What you can hire us for</h2>
+  <div class="hire">
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>Our researchers waste weeks building backtests.</div>
+      <div class="he"><b>Research &amp; backtesting platform</b>
+        <span>vectorized engine &middot; point-in-time data &middot; validation gates &middot; sweep runner</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>We have strategies, but execution is messy.</div>
+      <div class="he"><b>OMS / EMS + execution infrastructure</b>
+        <span>order lifecycle &middot; planner &middot; durable writer &middot; order walk &middot; fills</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>We need another broker.</div>
+      <div class="he"><b>Broker / venue integration</b>
+        <span>one typed port, N adapters &middot; auth &middot; orders &middot; positions &middot; streaming</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>We're worried about live trading failures.</div>
+      <div class="he"><b>Risk + reconciliation layer</b>
+        <span>independent RMS with veto &middot; breakers &middot; kill switch &middot; broker-truth reconciliation</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>Everything is notebooks and scripts.</div>
+      <div class="he"><b>Productionisation project</b>
+        <span>ports &amp; adapters &middot; enforced boundaries &middot; test taxonomy &middot; staged exposure</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>Our data is a mess.</div>
+      <div class="he"><b>Market-data infrastructure</b>
+        <span>ETL &middot; symbol resolution &middot; corporate actions &middot; bitemporal snapshot</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>We want multiple strategies on one stack.</div>
+      <div class="he"><b>Multi-strategy platform</b>
+        <span>sleeve allocator &middot; capital book &middot; margin coordination &middot; per-strategy attribution</span></div>
+    </div>
+    <div class="hrow">
+      <div class="hp"><i>&ldquo;</i>Our trader handles adjustments manually.</div>
+      <div class="he"><b>Workflow / execution automation</b>
+        <span>operator console &middot; alerting with escalation &middot; automated adjustment &middot; kill &middot; flatten</span></div>
+    </div>
+  </div>
+
+  <div class="shapes">
+    <span>HOW IT'S STRUCTURED</span>
+    <b>Targeted build</b><span>one component &middot; fixed scope &middot; weeks</span>
+    <b>Platform build</b><span>end-to-end &middot; vertical slices &middot; retained &middot; months</span>
+    <b>Review &amp; hardening</b><span>audit what you have &middot; fixed scope &middot; weeks</span>
+    <span style="flex-basis:100%;margin-top:4px">Acceptance tests agreed before work starts. Running, tested software at every checkpoint.</span>
+  </div>
+
+  <div class="omit">
+    <span class="ot">Not on this page</span>
+    <span class="ox">&#10005; strategy logic</span><span class="ox">&#10005; parameters</span>
+    <span class="ox">&#10005; research conclusions</span><span class="ox">&#10005; returns / Sharpe / AUM</span>
+    <span class="oy">&#10003; architecture &amp; method</span><span class="oy">&#10003; code review under NDA</span>
+    <span style="font-size:11.5px;color:var(--faint);flex-basis:100%;margin-top:4px">
+      Runs both ways &mdash; your data, signals and parameters never appear in another engagement.</span>
+  </div>
+</div></section>
+
+<footer id="contact"><div class="wrap">
+  <div class="fg">
+    <div class="fl">
+      <div class="tag g">06 &mdash; Contact</div>
+      <h2 style="margin-bottom:10px">Start with the hard question</h2>
+      <p>Name the part of your stack you trust least. We'll tell you plainly whether it's something
+        we should build &mdash; and if it isn't, we'll say that too.</p>
+    </div>
+    <div class="ct">
+      <div><span class="l">Email</span> <a href="mailto:yash_gade@obsidianquantsystems.com">yash_gade@obsidianquantsystems.com</a></div>
+      <div><span class="l">LinkedIn</span> <a href="https://www.linkedin.com/in/yash-shrikant-gade-8b980a58/" target="_blank" rel="noopener">/in/yash-shrikant-gade</a></div>
+      <div><span class="l">Phone</span> <span style="color:var(--dim)">+1 571-244-8704</span></div>
+      <div><span class="l">Working</span> <span style="color:var(--dim)">Remote &middot; global</span></div>
+    </div>
+  </div>
+  <div class="fine">
+    <span>&copy; ObsidianQuant Capital LLC &mdash; infrastructure engineering for systematic trading.</span>
+    <span>No investment advice. No solicitation. No performance claims made or implied.</span>
+  </div>
+</div></footer>
+
+</body>
+</html>

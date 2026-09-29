@@ -1,0 +1,104 @@
+# ---------------------------------------------------------------------------
+# DIAGRAM 02 — Research method.
+#
+# Ordered by the QUESTION each stage answers, not by statistical technique.
+#   discovery  : is the signal real, and which part of it carries the signal?
+#   expression : how do we trade it, and what does that cost at size?
+#   validation : does it survive costs, and does it add to the book?
+# Ends at portfolio correlation — live execution is a separate diagram.
+#
+# The unified panel is NOT repeated here; diagram 01 establishes it.
+# Build via ./build.sh
+# ---------------------------------------------------------------------------
+
+direction: right
+
+style.fill: "#0a0c11"
+
+classes: {
+  step: {
+    style: {
+      fill: "#151a24"; stroke: "#2d5f9e"; stroke-width: 2
+      font-color: "#c3cbd9"; border-radius: 8; font-size: 22
+    }
+  }
+  key: {
+    style: {
+      fill: "#1c1609"; stroke: "#e8b84b"; stroke-width: 4
+      font-color: "#e8b84b"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  expr: {
+    style: {
+      fill: "#1a1428"; stroke: "#8a6cc4"; stroke-width: 3
+      font-color: "#c9b8e8"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  gate: {
+    style: {
+      fill: "#101f1a"; stroke: "#3ddc97"; stroke-width: 3
+      font-color: "#3ddc97"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  dead: {
+    style: {
+      fill: "#1c1216"; stroke: "#a3465c"; stroke-width: 3
+      font-color: "#e8899f"; border-radius: 8; font-size: 22
+    }
+  }
+  grp: {
+    style: {
+      fill: "#0d1017"; stroke: "#1f2634"; stroke-width: 2; stroke-dash: 4
+      font-color: "#8a93a6"; border-radius: 10; font-size: 22; bold: true
+    }
+  }
+}
+
+discovery: "DISCOVERY   —   is it real?" {
+  class: grp
+  grid-rows: 4
+  h: "HYPOTHESIS\npre-registered\nkill criterion written first" { class: step }
+  b: "DUMB BASELINE\nthe trivial version\n→ beat this, or you have nothing" { class: key }
+  w: "BASELINE OOS + WALK-FORWARD\nis the harness itself sound?" { class: step }
+  a: "ABLATION\nremove one component at a time\n→ which part carries the signal?" { class: key }
+}
+
+expression: "EXPRESSION   —   how do we trade it?" {
+  class: grp
+  grid-rows: 2
+  e: "EQUITY · FUTURE · OPTION\nsame view, different cost,\nmargin, capacity, tail" { class: expr }
+  c: "COST + CAPACITY MODEL\nparticipation vs ADV\nimpact ~ √participation\n← calibrated by live TCA" { class: expr }
+}
+
+validation: "VALIDATION   —   does it survive?" {
+  class: grp
+  grid-rows: 3
+  s: "PARAM SWEEP\noptimised NET of cost\nnever on gross" { class: step }
+  p: "POINT-IN-TIME BACKTEST\nas-of data · full costs\ndeterministic, reproducible" { class: step }
+  k: "PORTFOLIO CORRELATION\nmarginal contribution\nnot standalone Sharpe" { class: gate }
+}
+
+live: "→ LIVE EXECUTION\npaper · restricted · full size" {
+  style: {
+    fill: "#101f1a"; stroke: "#3ddc97"; stroke-width: 4
+    font-color: "#3ddc97"; border-radius: 9; font-size: 24; bold: true
+  }
+}
+
+dead: "NEGATIVE RESULT\nkept · searchable\nnot rediscovered next quarter" { class: dead }
+
+discovery -> expression: "survives" {
+  style: { stroke: "#3ddc97"; stroke-width: 4; font-color: "#3ddc97"; font-size: 21; bold: true }
+}
+expression -> validation: "priced" {
+  style: { stroke: "#a78bfa"; stroke-width: 4; font-color: "#a78bfa"; font-size: 21; bold: true }
+}
+validation -> live: "adds to the book" {
+  style: { stroke: "#3ddc97"; stroke-width: 4; font-color: "#3ddc97"; font-size: 21; bold: true }
+}
+discovery -> dead: "reject" {
+  style: { stroke: "#e06c6c"; stroke-width: 3; stroke-dash: 4; font-color: "#e06c6c"; font-size: 21 }
+}
+validation -> dead: "reject" {
+  style: { stroke: "#e06c6c"; stroke-width: 3; stroke-dash: 4; font-color: "#e06c6c"; font-size: 21 }
+}

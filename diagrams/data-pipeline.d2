@@ -1,0 +1,112 @@
+# ---------------------------------------------------------------------------
+# DIAGRAM — Unified data pipeline.
+# Live and historical sources land in ONE snapshot shape:
+# fundamental + technical + derivatives on one row, keyed (instrument, trade date),
+# with provenance columns that make point-in-time a property of the store.
+# Build via ./build.sh
+# ---------------------------------------------------------------------------
+
+direction: right
+
+style.fill: "#0a0c11"
+
+classes: {
+  src: {
+    style: {
+      fill: "#1a1509"; stroke: "#5c4718"; stroke-width: 2
+      font-color: "#e8b84b"; border-radius: 7; font-size: 21
+    }
+  }
+  proc: {
+    style: {
+      fill: "#151a24"; stroke: "#2d5f9e"; stroke-width: 2
+      font-color: "#c3cbd9"; border-radius: 8; font-size: 22
+    }
+  }
+  screen: {
+    style: {
+      fill: "#1c1216"; stroke: "#a3465c"; stroke-width: 3
+      font-color: "#e8899f"; border-radius: 8; font-size: 21
+    }
+  }
+  colg: {
+    style: {
+      fill: "#132029"; stroke: "#2a7f9e"; stroke-width: 2
+      font-color: "#7cc7e0"; border-radius: 7; font-size: 21
+    }
+  }
+  prov: {
+    style: {
+      fill: "#10202e"; stroke: "#4a9fd0"; stroke-width: 3
+      font-color: "#8fd4f0"; border-radius: 7; font-size: 21; bold: true
+    }
+  }
+  cons: {
+    style: {
+      fill: "#101f1a"; stroke: "#3ddc97"; stroke-width: 3
+      font-color: "#3ddc97"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  grp: {
+    style: {
+      fill: "#0d1017"; stroke: "#1f2634"; stroke-width: 2; stroke-dash: 4
+      font-color: "#8a93a6"; border-radius: 10; font-size: 22; bold: true
+    }
+  }
+}
+
+sources: "SOURCES" {
+  class: grp
+  grid-rows: 2
+
+  live: "LIVE\nstreaming ticks · quotes\ndepth · order events" {
+    style: {
+      fill: "#1a1509"; stroke: "#e8b84b"; stroke-width: 3
+      font-color: "#e8b84b"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  hist: "HISTORICAL\nEOD packs · instrument master\ncorporate actions · fundamentals\noption chains" {
+    style: {
+      fill: "#1a1020"; stroke: "#8a6cc4"; stroke-width: 3
+      font-color: "#c9b8e8"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+}
+
+normalize: "NORMALIZE   ◆ one path, both sources\nsymbol resolution · unit discipline\ncorporate-action adjustment\ntyped schema" { class: proc }
+
+screens: "QUALITY SCREENS\ngap · stale · outlier → quarantine\nschema drift → halt ingest" { class: screen }
+
+snapshot: "◆ UNIFIED SNAPSHOT   —   key ( instrument · trade date )" {
+  style: {
+    fill: "#0b1620"; stroke: "#5aa9ff"; stroke-width: 4
+    font-color: "#5aa9ff"; border-radius: 11; font-size: 24; bold: true
+  }
+  grid-rows: 4
+  grid-gap: 22
+
+  tech: "TECHNICAL\nOHLC · volume · turnover" { class: colg }
+  fund: "FUNDAMENTAL\nvaluation ratios · yield · period end" { class: colg }
+  deriv: "DERIVATIVES\nchain · implied vol · greeks · term" { class: colg }
+  prov: "PROVENANCE\nsession · effective_from · source_asof" { class: prov }
+}
+
+consumers: "CONSUMERS" {
+  class: grp
+  grid-rows: 2
+  liveq: "LIVE STRATEGIES\nlatest state" { class: cons }
+  res: "RESEARCH · BACKTEST\nas-of reads — no look-ahead" { class: cons }
+}
+
+sources -> normalize: "" {
+  style: { stroke: "#e8b84b"; stroke-width: 4 }
+}
+normalize -> screens: "on ingest" {
+  style: { stroke: "#7d84a0"; stroke-width: 3; font-color: "#98a2b5"; font-size: 21 }
+}
+screens -> snapshot: "pass" {
+  style: { stroke: "#3ddc97"; stroke-width: 4; font-color: "#3ddc97"; font-size: 21; bold: true }
+}
+snapshot -> consumers: "one shape\nboth readers" {
+  style: { stroke: "#5aa9ff"; stroke-width: 4; font-color: "#5aa9ff"; font-size: 21; bold: true }
+}

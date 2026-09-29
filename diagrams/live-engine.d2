@@ -1,0 +1,146 @@
+# ---------------------------------------------------------------------------
+# DIAGRAM 2 — Live execution engine, full round trip, left to right.
+#
+# Cardinality:  1 venue : N brokers : N strategies : 1 shared core
+# Loop: venue → broker → market data → strategies → core(capital→RMS→EMS)
+#       → broker → venue, fills → OMS → RMS
+#
+# Sized to stay legible when scaled into a ~1180px page column:
+# short labels, few columns, type large relative to the canvas.
+# Build via ./build.sh
+# ---------------------------------------------------------------------------
+
+direction: right
+
+style.fill: "#0a0c11"
+
+classes: {
+  strat: {
+    style: {
+      fill: "#15243a"; stroke: "#2d5f9e"; stroke-width: 2
+      font-color: "#8fb4dd"; border-radius: 7; font-size: 24
+    }
+  }
+  row: {
+    style: {
+      fill: "#151a24"; stroke: "#2d5f9e"; stroke-width: 2
+      font-color: "#c3cbd9"; border-radius: 8; font-size: 22
+    }
+  }
+  mdrow: {
+    style: {
+      fill: "#0f1d24"; stroke: "#2a7f9e"; stroke-width: 3
+      font-color: "#7cc7e0"; border-radius: 8; font-size: 22
+    }
+  }
+  veto: {
+    style: {
+      fill: "#1c1609"; stroke: "#e8b84b"; stroke-width: 4
+      font-color: "#e8b84b"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  ok: {
+    style: {
+      fill: "#101f1a"; stroke: "#3ddc97"; stroke-width: 3
+      font-color: "#3ddc97"; border-radius: 8; font-size: 22; bold: true
+    }
+  }
+  brk: {
+    style: {
+      fill: "#1a1509"; stroke: "#5c4718"; stroke-width: 2
+      font-color: "#e8b84b"; border-radius: 7; font-size: 21
+    }
+  }
+  store: {
+    style: {
+      fill: "#0c171d"; stroke: "#2a4a5c"; stroke-width: 2
+      font-color: "#7cc7e0"; border-radius: 8; font-size: 21
+    }
+  }
+  grp: {
+    style: {
+      fill: "#0d1017"; stroke: "#1f2634"; stroke-width: 2; stroke-dash: 4
+      font-color: "#8a93a6"; border-radius: 10; font-size: 22; bold: true
+    }
+  }
+}
+
+venue: "VENUE · 1\nthe exchange\nmatching · clearing" {
+  style: {
+    fill: "#141020"; stroke: "#7a6cc4"; stroke-width: 3
+    font-color: "#c9c2e8"; border-radius: 9; font-size: 24; bold: true
+  }
+}
+
+brokers: "BROKERS · N\nthe only path to the venue\ndata broker ≠ exec broker" {
+  class: grp
+  grid-rows: 3
+  b1: "Broker 1\ndata feed" { class: brk }
+  b2: "Broker 2\norder gateway" { class: brk }
+  bn: "Broker N\nboth" { class: brk }
+}
+
+md: "MARKET DATA\nnormalize · symbols\ncorporate actions\n→ one canonical state" { class: mdrow }
+
+strategies: "STRATEGIES · N\n✕ no broker access" {
+  class: grp
+  grid-columns: 2
+  s1: "S₁" { class: strat }
+  s2: "S₂" { class: strat }
+  s3: "S₃" { class: strat }
+  sn: "Sₙ" { class: strat }
+}
+
+core: "◆ SHARED CORE · 1   —   written once" {
+  style: {
+    fill: "#0f151e"; stroke: "#5aa9ff"; stroke-width: 4
+    font-color: "#5aa9ff"; border-radius: 11; font-size: 24; bold: true
+  }
+  grid-rows: 4
+  grid-gap: 34
+
+  capital: "CAPITAL\nallocator · margin" { class: row }
+  rms: "RMS ◆ VETO\nlimits · breaker · kill" { class: veto }
+  ems: "EMS · sole order path\nroutes to any broker" { class: row }
+  oms: "OMS\nfills · reconciliation" { class: ok }
+
+  capital -> rms: "" { style: { stroke: "#7d84a0"; stroke-width: 2 } }
+  rms -> ems: "authorized only" {
+    style: { stroke: "#e8b84b"; stroke-width: 4; font-color: "#e8b84b"; font-size: 20; bold: true }
+  }
+  oms -> rms: "" { style: { stroke: "#5aa9ff"; stroke-width: 3; stroke-dash: 4 } }
+}
+
+sql: "SQL + COLUMNAR\norders · fills · positions\ndecision_events · ledger" { class: store }
+
+ops: "OPERATOR + ALERTS\nhealth · data · risk · execution\nreconciliation divergence\nseverity tiers · ack + escalate" {
+  style: {
+    fill: "#1c1216"; stroke: "#a3465c"; stroke-width: 4
+    font-color: "#e8899f"; border-radius: 9; font-size: 22; bold: true
+  }
+}
+
+venue <-> brokers: "1 quotes    6 orders" {
+  style: { stroke: "#a78bfa"; stroke-width: 4; font-color: "#a78bfa"; font-size: 21; bold: true }
+}
+brokers -> md: "2 N:1 ticks" {
+  style: { stroke: "#7cc7e0"; stroke-width: 3; font-color: "#7cc7e0"; font-size: 21; bold: true }
+}
+md -> strategies: "3 1:N state" {
+  style: { stroke: "#7cc7e0"; stroke-width: 3; font-color: "#7cc7e0"; font-size: 21; bold: true }
+}
+strategies -> core: "4 N:1 intents" {
+  style: { stroke: "#5aa9ff"; stroke-width: 4; font-color: "#5aa9ff"; font-size: 21; bold: true }
+}
+core <-> brokers: "5 1:N orders    7 N:1 fills" {
+  style: { stroke: "#e8b84b"; stroke-width: 4; font-color: "#e8b84b"; font-size: 21; bold: true }
+}
+core -> sql: "8 journal" {
+  style: { stroke: "#7cc7e0"; stroke-width: 3; font-color: "#7cc7e0"; font-size: 21 }
+}
+core -> ops: "9 observe\nreconciled state, not intent" {
+  style: { stroke: "#e8899f"; stroke-width: 3; font-color: "#e8899f"; font-size: 21; bold: true }
+}
+ops -> core: "10 control\nkill · flatten · pause" {
+  style: { stroke: "#e06c6c"; stroke-width: 4; font-color: "#e06c6c"; font-size: 21; bold: true }
+}

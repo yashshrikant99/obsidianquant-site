@@ -1,0 +1,73 @@
+# ---------------------------------------------------------------------------
+# DIAGRAM 04 — The whole arc, at a glance.
+# hypothesis → ablation → expression → point-in-time backtest
+#   → portfolio correlation → paper → restricted → full size
+# Same altitude as a one-slide summary; diagram 02 is the same thing at depth.
+# Build via ./build.sh
+# ---------------------------------------------------------------------------
+
+direction: right
+
+style.fill: "#0a0c11"
+
+classes: {
+  a: {
+    style: {
+      fill: "#151a24"; stroke: "#2d5f9e"; stroke-width: 3
+      font-color: "#c3cbd9"; border-radius: 9; font-size: 23
+    }
+  }
+  key: {
+    style: {
+      fill: "#1c1609"; stroke: "#e8b84b"; stroke-width: 4
+      font-color: "#e8b84b"; border-radius: 9; font-size: 23; bold: true
+    }
+  }
+  expr: {
+    style: {
+      fill: "#1a1428"; stroke: "#8a6cc4"; stroke-width: 4
+      font-color: "#c9b8e8"; border-radius: 9; font-size: 23; bold: true
+    }
+  }
+  cap: {
+    style: {
+      fill: "#0f1d24"; stroke: "#2a7f9e"; stroke-width: 3
+      font-color: "#7cc7e0"; border-radius: 9; font-size: 23
+    }
+  }
+  s1: {
+    style: {
+      fill: "#0e1a16"; stroke: "#2a6b52"; stroke-width: 3
+      font-color: "#6fd4a8"; border-radius: 9; font-size: 23
+    }
+  }
+  s2: {
+    style: {
+      fill: "#0f2019"; stroke: "#2f9b71"; stroke-width: 4
+      font-color: "#3ddc97"; border-radius: 9; font-size: 23; bold: true
+    }
+  }
+  s3: {
+    style: {
+      fill: "#10261d"; stroke: "#3ddc97"; stroke-width: 5
+      font-color: "#3ddc97"; border-radius: 9; font-size: 24; bold: true
+    }
+  }
+}
+
+h: "HYPOTHESIS\nfalsifiable\nkill criterion first" { class: a }
+ab: "ABLATION\nwhich part carries\nthe signal?" { class: key }
+ex: "EXPRESSION\nequity · future\noption" { class: expr }
+pit: "POINT-IN-TIME\nBACKTEST\nas-of · net of cost" { class: cap }
+pc: "PORTFOLIO\nCORRELATION\nmarginal, not standalone" { class: cap }
+pa: "PAPER\nzero capital" { class: s1 }
+rs: "RESTRICTED\nbounded size" { class: s2 }
+fs: "FULL SIZE\nnormal exposure" { class: s3 }
+
+h -> ab: "" { style: { stroke: "#5aa9ff"; stroke-width: 3 } }
+ab -> ex: "" { style: { stroke: "#e8b84b"; stroke-width: 3 } }
+ex -> pit: "" { style: { stroke: "#a78bfa"; stroke-width: 3 } }
+pit -> pc: "" { style: { stroke: "#7cc7e0"; stroke-width: 3 } }
+pc -> pa: "" { style: { stroke: "#3ddc97"; stroke-width: 3 } }
+pa -> rs: "" { style: { stroke: "#3ddc97"; stroke-width: 4 } }
+rs -> fs: "" { style: { stroke: "#3ddc97"; stroke-width: 5 } }
